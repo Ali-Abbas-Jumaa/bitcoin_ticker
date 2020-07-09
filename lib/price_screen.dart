@@ -9,7 +9,7 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
-  String selectedCurrency = "USD";
+  String selectedCurrency = "AUD";
 
   DropdownButton<String> androidDropdown() {
     List<DropdownMenuItem<String>> dropdownItems = [];
@@ -26,26 +26,27 @@ class _PriceScreenState extends State<PriceScreen> {
       onChanged: (value) {
         setState(() {
           selectedCurrency = value;
+          getData(selectedCurrency);
         });
       },
     );
   }
 
   CupertinoPicker iOSPicker() {
-    List<Text> pickerList = [];
-
+    List<Text> pickerItems = [];
     for (String currency in currenciesList) {
-      var newItem = new Text(
-        currency,
-      );
-      pickerList.add(newItem);
+      pickerItems.add(Text(currency));
     }
+
     return CupertinoPicker(
+      backgroundColor: Colors.lightBlue,
       itemExtent: 32.0,
-      onSelectedItemChanged: (value) {
-        print(value);
+      onSelectedItemChanged: (selectedIndex) {
+        selectedCurrency = currenciesList[selectedIndex];
+        getData(selectedCurrency);
+        print(selectedIndex);
       },
-      children: pickerList,
+      children: pickerItems,
     );
   }
 
@@ -65,9 +66,9 @@ class _PriceScreenState extends State<PriceScreen> {
 
   String bitcoinValue = '?';
 
-  void getData() async {
+  void getData(selectedCurrency) async {
     try {
-      double data = await CoinData().getCoinData();
+      double data = await CoinData().getCoinData(selectedCurrency);
       setState(() {
         bitcoinValue = data.toStringAsFixed(0);
       });
@@ -79,7 +80,7 @@ class _PriceScreenState extends State<PriceScreen> {
   @override
   void initState() {
     super.initState();
-    getData();
+    getData(selectedCurrency);
   }
 
   @override
@@ -103,7 +104,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = $bitcoinValue USD',
+                  '1 BTC = $bitcoinValue $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
@@ -118,7 +119,7 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: getPicker(), //androidDropdown(),
+            child: iOSPicker(), //androidDropdown(),
           ),
         ],
       ),
