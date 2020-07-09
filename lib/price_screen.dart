@@ -10,7 +10,6 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = "USD";
-  String exchangeRate;
 
   DropdownButton<String> androidDropdown() {
     List<DropdownMenuItem<String>> dropdownItems = [];
@@ -64,29 +63,27 @@ class _PriceScreenState extends State<PriceScreen> {
     return androidDropdown();
   }
 
-  void getData() async {
-    var data = await CoinData().getCoinData();
-    exchangeRate = data['rate'].toStringAsFixed(2).toString();
-    print(exchangeRate);
-    updateUI(exchangeRate);
-  }
+  String bitcoinValue = '?';
 
-  updateUI(value) {
-    setState(() {
-      exchangeRate = value;
-    });
+  void getData() async {
+    try {
+      double data = await CoinData().getCoinData();
+      setState(() {
+        bitcoinValue = data.toStringAsFixed(0);
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getData();
   }
 
   @override
   Widget build(BuildContext context) {
-    print(exchangeRate);
     return Scaffold(
       appBar: AppBar(
         title: Text('🤑 Coin Ticker'),
@@ -106,7 +103,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = $exchangeRate USD',
+                  '1 BTC = $bitcoinValue USD',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,

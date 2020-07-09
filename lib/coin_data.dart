@@ -30,13 +30,21 @@ const List<String> cryptoList = [
   'ETH',
   'LTC',
 ];
+const coinAPIURL = 'https://rest.coinapi.io/v1/exchangerate';
+const apiKey = '6C261652-D645-426E-9E2D-B6C98FD3C7BD';
 
 class CoinData {
-  Future<dynamic> getCoinData() async {
-    var url =
-        "https://rest.coinapi.io/v1/exchangerate/BTC/USD?apikey=6C261652-D645-426E-9E2D-B6C98FD3C7BD";
-    var data = await http.get(url);
-    print(data.body);
-    return convert.jsonDecode(data.body);
+  Future getCoinData() async {
+    //TODO 4: Update the URL to use the selectedCurrency input.
+    String requestURL = '$coinAPIURL/BTC/USD?apikey=$apiKey';
+    http.Response response = await http.get(requestURL);
+    if (response.statusCode == 200) {
+      var decodedData = convert.jsonDecode(response.body);
+      var lastPrice = decodedData['rate'];
+      return lastPrice;
+    } else {
+      print(response.statusCode);
+      throw 'Problem with the get request';
+    }
   }
 }
