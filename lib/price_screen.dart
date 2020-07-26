@@ -64,13 +64,19 @@ class _PriceScreenState extends State<PriceScreen> {
     return androidDropdown();
   }
 
-  String bitcoinValue = '?';
+  String btcValue = '?';
+  String ethValue = '?';
+  String ltcValue = '?';
 
   void getData(selectedCurrency) async {
     try {
-      double data = await CoinData().getCoinData(selectedCurrency);
+      double btc = await CoinData().getCoinData(selectedCurrency, 'BTC');
+      double eth = await CoinData().getCoinData(selectedCurrency, 'ETH');
+      double ltc = await CoinData().getCoinData(selectedCurrency, 'LTC');
       setState(() {
-        bitcoinValue = data.toStringAsFixed(0);
+        btcValue = btc.toStringAsFixed(0);
+        ethValue = eth.toStringAsFixed(0);
+        ltcValue = ltc.toStringAsFixed(0);
       });
     } catch (e) {
       print(e);
@@ -83,6 +89,30 @@ class _PriceScreenState extends State<PriceScreen> {
     getData(selectedCurrency);
   }
 
+  Widget currencyCard(String cryptoName, String currency) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+      child: Card(
+        color: Colors.lightBlueAccent,
+        elevation: 5.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+          child: Text(
+            '1 $cryptoName = $currency $selectedCurrency',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20.0,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,33 +123,21 @@ class _PriceScreenState extends State<PriceScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  '1 BTC = $bitcoinValue $selectedCurrency',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              currencyCard("BTC", btcValue),
+              currencyCard("ETH", ethValue),
+              currencyCard("LTC", ltcValue),
+            ],
           ),
           Container(
             height: 150.0,
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: iOSPicker(), //androidDropdown(),
+            child: getPicker(), //androidDropdown(),
           ),
         ],
       ),
